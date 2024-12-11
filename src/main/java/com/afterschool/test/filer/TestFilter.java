@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
-@WebFilter(urlPatterns = "/*")
+@WebFilter("/*")
 @Component
 @Order(1)
 public class TestFilter implements Filter {
@@ -25,6 +25,11 @@ public class TestFilter implements Filter {
         HttpServletResponse response = (HttpServletResponse) servletResponse;
         if(request.getSession().getAttribute("email") != null) {
             System.out.println(request.getSession().getAttribute("email"));
+        }
+        else{
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("missing token.");
+            return;
         }
         filterChain.doFilter(servletRequest, servletResponse);
         System.out.println("TestFilter doFilter two");
