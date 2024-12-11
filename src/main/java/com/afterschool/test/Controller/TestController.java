@@ -32,7 +32,7 @@ public class TestController {
             return ResponseEntity.badRequest().body("fail");
         }
         else{
-            session.setAttribute("userid", id);
+            session.setAttribute("email", id);
             return ResponseEntity.ok().body("success");
         }
     }
