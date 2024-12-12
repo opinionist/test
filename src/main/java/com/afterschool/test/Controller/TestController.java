@@ -6,6 +6,7 @@ import com.afterschool.test.Service.LoginService;
 import com.afterschool.test.repository.UserRepo;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,7 +33,7 @@ public class TestController {
             return ResponseEntity.badRequest().body("fail");
         }
         else{
-            session.setAttribute("email", id);
+            session.setAttribute("id", id);
             return ResponseEntity.ok().body("success");
         }
     }
@@ -60,7 +61,7 @@ public class TestController {
 
     @GetMapping("/logout")
     public ResponseEntity<String>logout(HttpSession session){
-        Long id = (Long) session.getAttribute("userid");
+        Long id = (Long) session.getAttribute("id");
         User user = userRepository.findUserById(id);
         if(user==null){
             return ResponseEntity.badRequest().body("fail");
@@ -70,11 +71,16 @@ public class TestController {
 
     @PostMapping("/logout")
     public ResponseEntity<String>logout2(HttpSession session){
-        Long id = (Long) session.getAttribute("userid");
+        Long id = (Long) session.getAttribute("id");
         if(id!=null) {
             session.invalidate();
             return ResponseEntity.ok().body("success");
         }
         return ResponseEntity.badRequest().body("fail");
+    }
+
+    @PostMapping("/check")
+    public ResponseEntity<String> check(HttpSession session){
+        return ResponseEntity.ok("asdf");
     }
 }

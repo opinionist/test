@@ -23,14 +23,7 @@ public class TestFilter implements Filter {
         System.out.println("TestFilter doFilter");
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response = (HttpServletResponse) servletResponse;
-        if(request.getSession().getAttribute("email") != null) {
-            System.out.println(request.getSession().getAttribute("email"));
-        }
-        else{
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("missing token.");
-            return;
-        }
+
         filterChain.doFilter(servletRequest, servletResponse);
         System.out.println("TestFilter doFilter two");
     }
