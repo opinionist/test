@@ -46,10 +46,7 @@ public class TestController {
     @PostMapping("/signup")
     public ResponseEntity<String>signup2(@RequestBody UserDTO dto){
         try {
-            User user = User.builder()
-                    .email(dto.getEmail())
-                    .password(dto.getPassword())
-                    .build();
+            User user = dto.toEntity();
             loginService.signup(user);
             return ResponseEntity.ok().body("success");
         }
