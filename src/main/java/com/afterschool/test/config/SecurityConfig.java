@@ -1,5 +1,7 @@
 package com.afterschool.test.config;
 
+import com.afterschool.test.jwt.CustomAccessDeniedHandler;
+import com.afterschool.test.jwt.CustomAuthenticationEntryPoint;
 import com.afterschool.test.jwt.JwtAuthenticationFilter;
 import com.afterschool.test.jwt.JwtTokenProvider;
 import org.springframework.context.annotation.Bean;
