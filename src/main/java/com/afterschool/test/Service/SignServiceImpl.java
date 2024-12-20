@@ -56,13 +56,37 @@ public class SignServiceImpl implements SignService{
         logger.info("[getSignResult] userEntity 값이 들어왔는지 확인 후 결과값 주입");
         if(!savedUser.getName().isEmpty()){
             logger.info("[getSignResult] userEntity 정상 처리 완료");
-
+            setSuccessResult(signUpResultDto);
         }
+        else{
+            logger.info("[getSignResult] userEntity 실패 처리 완료");
+            setFailResult(signUpResultDto);
+        }
+
+        return signUpResultDto;
     }
 
     @Override
     public SigninResultDto signIn(String id, String password) throws RuntimeException {
-        return null;
+        logger.info("[getSignInResult] signDataHandler 로 회원 정보 요청");
+        User user = userRepo.getByUid(id);
+        logger.info("[getSignInResult] 패스워드 비교 수행");
+
+        if(!passwordEncoder.matches(password, user.getPassword())){
+            throw new RuntimeException();
+        }
+        logger.info("[getSignInResult] 패스워드 일치");
+
+        logger.info("[getSignInResult] SignInResultDto 객체 생성");
+        SigninResultDto signinResultDto = SigninResultDto.builder()
+                .token(jwtTokenProvider.createToken(String.valueOf(user.getId())
+                ,user.getRoles()))
+                .build();
+
+        logger.info("[getSignInResult] SignInResultDto 객체에 값 주입");
+        setSuccessResult(signinResultDto);
+
+        return signinResultDto;
     }
 
     private void setSuccessResult(SignUpResultDto result){
