@@ -1,12 +1,11 @@
 package com.afterschool.test.Controller;
 
 import com.afterschool.test.Entity.User;
-import com.afterschool.test.Entity.UserDTO;
-import com.afterschool.test.Service.LoginService;
+import com.afterschool.test.Entity.dto.UserDTO;
+import com.afterschool.test.Service.TestService;
 import com.afterschool.test.repository.UserRepo;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class TestController {
 
-    private final LoginService loginService;
+    private final TestService testService;
     private final UserRepo userRepository;
 
     @GetMapping("/login")
@@ -28,7 +27,7 @@ public class TestController {
 
     @PostMapping("/login")
     public ResponseEntity<String>login2(@RequestBody UserDTO dto, HttpSession session){
-        Long id = loginService.login(dto.getEmail(), dto.getPassword());
+        Long id = testService.login(dto.getEmail(), dto.getPassword());
         if(id==null){
             return ResponseEntity.badRequest().body("fail");
         }
@@ -47,7 +46,7 @@ public class TestController {
     public ResponseEntity<String>signup2(@RequestBody UserDTO dto){
         try {
             User user = dto.toEntity();
-            loginService.signup(user);
+            testService.signup(user);
             return ResponseEntity.ok().body("success");
         }
         catch (Exception e){

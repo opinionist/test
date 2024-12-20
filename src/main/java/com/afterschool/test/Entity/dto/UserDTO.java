@@ -1,5 +1,6 @@
-package com.afterschool.test.Entity;
+package com.afterschool.test.Entity.dto;
 
+import com.afterschool.test.Entity.User;
 import lombok.Data;
 
 @Data

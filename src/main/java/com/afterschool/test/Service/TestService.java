@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class LoginService {
+public class TestService {
 
     private final UserRepo userRepository;
 
