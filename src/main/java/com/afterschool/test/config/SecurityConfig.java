@@ -34,7 +34,7 @@ public class SecurityConfig {
                                 new AntPathRequestMatcher("/sign-api/sign-up"),
                                 new AntPathRequestMatcher("/sign-api/exception"))
                         .permitAll()
-                        .requestMatchers(HttpMethod.GET, "/product/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/test").permitAll()
                         .requestMatchers(new AntPathRequestMatcher("**/exception/**")).permitAll()
                         .anyRequest().hasRole("ADMIN"))
                 .exceptionHandling(ex -> ex

@@ -79,7 +79,7 @@ public class SignServiceImpl implements SignService{
 
         logger.info("[getSignInResult] SignInResultDto 객체 생성");
         SigninResultDto signinResultDto = SigninResultDto.builder()
-                .token(jwtTokenProvider.createToken(String.valueOf(user.getId())
+                .token(jwtTokenProvider.createToken(String.valueOf(user.getUid())
                 ,user.getRoles()))
                 .build();
 
