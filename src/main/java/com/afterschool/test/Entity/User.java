@@ -37,8 +37,8 @@ public class User implements UserDetails {
     @Builder.Default
     private List<String> roles = new ArrayList<String>();
 
-    @Column(unique = true, nullable = false)
-    private String email;
+//    @Column(unique = true, nullable = false)
+//    private String email;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -75,9 +75,9 @@ public class User implements UserDetails {
         return true;
     }
 
-    @Builder
-    public User(String password, String email) {
-        this.password = password;
-        this.email = email;
-    }
+//    @Builder
+//    public User(String password, String email) {
+//        this.password = password;
+//        this.email = email;
+//    }
 }
