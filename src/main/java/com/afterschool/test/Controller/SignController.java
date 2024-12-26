@@ -28,17 +28,19 @@ public class SignController {
     }
 
     @PostMapping("/sign-in")
-    public SigninResultDto signIn(@RequestBody SignInCauseDto signInCauseDto) throws RuntimeException {
+    public ResponseEntity<SigninResultDto> signIn(@RequestBody SignInCauseDto signInCauseDto) throws RuntimeException {
         String id = signInCauseDto.getId();
         String password = signInCauseDto.getPassword();
+        HttpHeaders headers = new HttpHeaders();
 
         logger.info("[SignIn] 로그인을 시도하고 있습니다. id : {}, pw : ****", id);
         SigninResultDto signInResultDto = signService.signIn(id, password);
 
         if (signInResultDto.getCode() == 0){
             logger.info("[signIn] 정상적으로 로그인되었습니다. id : {}, token : {}", id, signInResultDto.getToken());
+            headers.set("token", signInResultDto.getToken());
         }
-        return signInResultDto;
+        return ResponseEntity.ok().headers(headers).body(signInResultDto);
     }
 
     @PostMapping("/sign-up")
@@ -50,7 +52,6 @@ public class SignController {
         logger.info("[SignUp] 회원가입을 수행합니다. id : {}", id);
 
         SignUpResultDto signUpResultDto = signService.signUp(id, password, name, role);
-
 
         logger.info("[SignUp] 회원가입을 완료했습니다. id : {}", id);
         return signUpResultDto;
