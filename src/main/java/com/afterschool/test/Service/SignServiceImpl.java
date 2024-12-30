@@ -6,6 +6,7 @@ import com.afterschool.test.Entity.dto.SigninResultDto;
 import com.afterschool.test.jwt.CommonResponse;
 import com.afterschool.test.jwt.JwtTokenProvider;
 import com.afterschool.test.repository.UserRepo;
+import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,12 +22,14 @@ public class SignServiceImpl implements SignService{
     public UserRepo userRepo;
     public JwtTokenProvider jwtTokenProvider;
     public PasswordEncoder passwordEncoder;
+    public CookieUtil cookieUtil;
 
     @Autowired
-    public SignServiceImpl(UserRepo userRepo, JwtTokenProvider jwtTokenProvider, PasswordEncoder passwordEncoder) {
+    public SignServiceImpl(UserRepo userRepo, JwtTokenProvider jwtTokenProvider, PasswordEncoder passwordEncoder, CookieUtil cookieUtil) {
         this.userRepo = userRepo;
         this.jwtTokenProvider = jwtTokenProvider;
         this.passwordEncoder = passwordEncoder;
+        this.cookieUtil = cookieUtil;
     }
 
     @Override
@@ -67,7 +70,7 @@ public class SignServiceImpl implements SignService{
     }
 
     @Override
-    public SigninResultDto signIn(String id, String password) throws RuntimeException {
+    public SigninResultDto signIn(String id, String password, HttpServletResponse response) throws RuntimeException {
         logger.info("[getSignInResult] signDataHandler 로 회원 정보 요청");
         User user = userRepo.getByUid(id);
         logger.info("[getSignInResult] 패스워드 비교 수행");
@@ -83,6 +86,8 @@ public class SignServiceImpl implements SignService{
                 ,user.getRoles()))
                 .build();
 
+        cookieUtil.addJwtCookie(response,signinResultDto.getToken());
+        logger.info("[getSignInResult] Cookie에 token값 주입");
         logger.info("[getSignInResult] SignInResultDto 객체에 값 주입");
         setSuccessResult(signinResultDto);
 

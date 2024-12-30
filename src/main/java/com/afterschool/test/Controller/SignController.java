@@ -5,6 +5,7 @@ import com.afterschool.test.Entity.dto.SignUpCauseDto;
 import com.afterschool.test.Entity.dto.SignUpResultDto;
 import com.afterschool.test.Entity.dto.SigninResultDto;
 import com.afterschool.test.Service.SignService;
+import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,13 +29,13 @@ public class SignController {
     }
 
     @PostMapping("/sign-in")
-    public ResponseEntity<SigninResultDto> signIn(@RequestBody SignInCauseDto signInCauseDto) throws RuntimeException {
+    public ResponseEntity<SigninResultDto> signIn(@RequestBody SignInCauseDto signInCauseDto, HttpServletResponse response) throws RuntimeException {
         String id = signInCauseDto.getId();
         String password = signInCauseDto.getPassword();
         HttpHeaders headers = new HttpHeaders();
 
         logger.info("[SignIn] 로그인을 시도하고 있습니다. id : {}, pw : ****", id);
-        SigninResultDto signInResultDto = signService.signIn(id, password);
+        SigninResultDto signInResultDto = signService.signIn(id, password, response);
 
         if (signInResultDto.getCode() == 0){
             logger.info("[signIn] 정상적으로 로그인되었습니다. id : {}, token : {}", id, signInResultDto.getToken());
