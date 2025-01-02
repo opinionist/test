@@ -1,10 +1,9 @@
 package com.afterschool.test.Controller;
 
-import com.afterschool.test.Entity.dto.SignInCauseDto;
-import com.afterschool.test.Entity.dto.SignUpCauseDto;
-import com.afterschool.test.Entity.dto.SignUpResultDto;
-import com.afterschool.test.Entity.dto.SigninResultDto;
+import com.afterschool.test.Entity.dto.*;
 import com.afterschool.test.Service.SignService;
+import com.afterschool.test.jwt.JwtTokenProvider;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -22,10 +22,12 @@ import java.util.Map;
 public class SignController {
     private final Logger logger = LoggerFactory.getLogger(SignController.class);
     private final SignService signService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Autowired
-    public SignController (SignService signService) {
+    public SignController (SignService signService, JwtTokenProvider jwtTokenProvider) {
         this.signService = signService;
+        this.jwtTokenProvider = jwtTokenProvider;
     }
 
     @PostMapping("/sign-in")
@@ -39,7 +41,8 @@ public class SignController {
 
         if (signInResultDto.getCode() == 0){
             logger.info("[signIn] 정상적으로 로그인되었습니다. id : {}, token : {}", id, signInResultDto.getToken());
-            headers.set("token", signInResultDto.getToken());
+            headers.set("access", signInResultDto.getToken());
+            headers.set("refresh", signInResultDto.getRefresh());
         }
         return ResponseEntity.ok().headers(headers).body(signInResultDto);
     }
@@ -61,6 +64,29 @@ public class SignController {
     @GetMapping("/exception")
     public void exceptionTest() throws RuntimeException {
         throw new RuntimeException("접근이 금지되었습니다.");
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refresh(@RequestBody RefreshRequest request, HttpServletResponse response) throws RuntimeException {
+        String refresh = request.getRefresh();
+
+        if(!jwtTokenProvider.validateToken(refresh)){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        logger.info("test");
+
+        String username = jwtTokenProvider.getUsername(refresh);
+        List<String> role = jwtTokenProvider.getRoles(refresh);
+
+        String token = jwtTokenProvider.createToken(username, role);
+        Cookie cookie = new Cookie("access", token);
+        cookie.setHttpOnly(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(3600);
+        cookie.setSecure(true);
+        response.addCookie(cookie);
+
+        return ResponseEntity.ok().header(HttpHeaders.AUTHORIZATION, "Bearer " + token).build();
     }
 
     @ExceptionHandler(RuntimeException.class)

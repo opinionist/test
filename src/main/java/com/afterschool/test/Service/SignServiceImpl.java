@@ -84,9 +84,11 @@ public class SignServiceImpl implements SignService{
         SigninResultDto signinResultDto = SigninResultDto.builder()
                 .token(jwtTokenProvider.createToken(String.valueOf(user.getUid())
                 ,user.getRoles()))
+                .refresh(jwtTokenProvider.createRefresh(String.valueOf(user.getUid())
+                        ,user.getRoles()))
                 .build();
 
-        cookieUtil.addJwtCookie(response,signinResultDto.getToken());
+        cookieUtil.addJwtCookie(response,signinResultDto.getToken(), signinResultDto.getRefresh());
         logger.info("[getSignInResult] Cookie에 token값 주입");
         logger.info("[getSignInResult] SignInResultDto 객체에 값 주입");
         setSuccessResult(signinResultDto);

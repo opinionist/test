@@ -2,10 +2,7 @@ package com.afterschool.test.jwt;
 
 import com.afterschool.test.Entity.UserDetails;
 import com.afterschool.test.Service.UserDetailsService;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +27,7 @@ public class JwtTokenProvider {
     @Value("${jwt.secret}")
     public String secretKey;
     private final long tokenValidMillisecond = 1000L * 60 * 60;
+    private final long refreshTokenValidMillisecond = 1000L * 60 * 60 * 24 * 7;
 
     @PostConstruct
     protected void init() {
@@ -37,6 +35,24 @@ public class JwtTokenProvider {
         secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes(StandardCharsets.UTF_8));
 
         LOGGER.info("[init] JwtTokenProvider 내 secretKey 초기화 완료");
+    }
+
+    public String createRefresh(String userId, List<String> roles){
+        LOGGER.info("[createRefresh] 리프레쉬 토큰 생성 시작");
+        Claims claims = Jwts.claims().setSubject(userId);
+        claims.put("roles", roles);
+        Date now = new Date();
+
+        String token = Jwts.builder()
+                .setClaims(claims)
+                .setIssuedAt(now)
+                .setExpiration(new Date(now.getTime() + refreshTokenValidMillisecond))
+                .signWith(SignatureAlgorithm.HS256, secretKey)
+                .compact();
+
+        LOGGER.info("[createRefresh] 리프레쉬 토큰 생성 완료");
+
+        return token;
     }
 
     public String createToken(String userId, List<String> roles){
@@ -70,6 +86,21 @@ public class JwtTokenProvider {
         LOGGER.info("[getUsername] 토큰 기반 회원 구별 정보 추출 완료 info : {}", info);
         return info;
     }
+
+    public List<String> getRoles(String token) {
+        LOGGER.info("[getRoles] 토큰 기반 권한 정보 추출");
+
+        Claims claims = Jwts.parser()
+                .setSigningKey(secretKey)
+                .parseClaimsJws(token)
+                .getBody();
+
+        List<String> roles = claims.get("role", List.class);
+        LOGGER.info("[getRoles] 토큰 기반 권한 정보 추출 완료 roles: {}", roles);
+
+        return roles;
+    }
+
 
     public String resolveToken(HttpServletRequest request) {
         LOGGER.info("[resolveToken] HTTP 헤더에서 Token 값 추출");

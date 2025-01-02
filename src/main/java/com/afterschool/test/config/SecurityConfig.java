@@ -32,7 +32,8 @@ public class SecurityConfig {
                         .requestMatchers(
                                 new AntPathRequestMatcher("/sign-api/sign-in"),
                                 new AntPathRequestMatcher("/sign-api/sign-up"),
-                                new AntPathRequestMatcher("/sign-api/exception"))
+                                new AntPathRequestMatcher("/sign-api/exception"),
+                                new AntPathRequestMatcher("/sign-api/refresh"))
                         .permitAll()
                         .requestMatchers(HttpMethod.GET, "/test").permitAll()
                         .requestMatchers(new AntPathRequestMatcher("**/exception/**")).permitAll()
